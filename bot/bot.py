@@ -30,24 +30,16 @@ def christ2crist( txt):
     txt = re.sub( "christiano", edit_match, txt, flags=re.I)
     return "> " + txt.replace("\n\n", "\n\n> ") + "\n\n FTFY."
 
-def CorrectComments( subreddit="test", last_n_comments=1000, corrected_comments=set()):
+def CorrectComments( handle, subreddit="test"):
     """
     Parses the last posted comments of a subreddit
     """
-    last_comments = handle.subreddit(subreddit).comments(limit=last_n_comments)
-    for comment in last_comments:
-        if "christiano" in comment.body.lower() and comment.id not in corrected_comments and comment.author != config.username:
+    for comment in handle.subreddit(subreddit).stream.comments():
+        if "christiano" in comment.body.lower() and comment.author != config.username:
             print( comment.id, comment.body)
             comment.reply( christ2crist( comment.body))
-            corrected_comments.add( comment.id)
 
 
-corrected_comments = set()
-while True:
-    try:
-        handle = login()
-        CorrectComments( subreddit="soccer", corrected_comments=corrected_comments)
-    except:
-        pass
-    finally:
-        sleep( 25)
+if __name__ == "__main__":
+    handle = login()
+    CorrectComments( handle, subreddit="soccer")
